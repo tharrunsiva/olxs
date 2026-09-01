@@ -7,6 +7,7 @@ pipeline {
         IMAGE_TAG      = "${BUILD_NUMBER}"
         K8S_DIR        = 'k8s'
         PATH           = "${WORKSPACE}/bin:${env.PATH}"
+        KUBECONFIG     = '/var/jenkins_home/.kube/config'
     }
 
     stages {
@@ -110,8 +111,8 @@ pipeline {
             echo '========================================================'
             echo '             FULL-STACK DEPLOYMENT SUCCESSFUL           '
             echo '========================================================'
-            echo 'Frontend is available at:    http://<HOST_IP>:30080'
-            echo 'Backend API is available at: http://<HOST_IP>:30500'
+            echo 'Frontend is available at:    http://localhost:30080'
+            echo 'Backend API is available at: http://localhost:30500'
             echo 'MongoDB is running internally at port 27017'
             echo '========================================================'
         }
