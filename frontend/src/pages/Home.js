@@ -88,7 +88,7 @@ const Home = () => {
               🔄 Peer-to-Peer Circular Economy
             </Badge>
             <h1 className="display-4 fw-extrabold mb-3" style={{ letterSpacing: '-1.5px', lineHeight: '1.15', color: 'var(--text-main)' }}>
-              Reduce. Reuse. <span className="gradient-text">ReLoop.</span>
+              Reduce. Reuse. <span className="gradient-text">ReLoops.</span>
             </h1>
             <p className="lead text-secondary mb-4" style={{ fontSize: '1.1rem' }}>
               Give items a second life. What is not useful for you is a treasure for someone else. Search local listings to claim donations or lease items.
