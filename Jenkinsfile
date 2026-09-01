@@ -6,6 +6,7 @@ pipeline {
         FRONTEND_IMAGE = 'reloop-frontend'
         IMAGE_TAG      = "${BUILD_NUMBER}"
         K8S_DIR        = 'k8s'
+        PATH           = "${WORKSPACE}/bin:${env.PATH}"
     }
 
     stages {
@@ -18,22 +19,25 @@ pipeline {
             }
         }
 
-        stage('Verify Environment') {
+        stage('Verify & Setup CLI Tools') {
             steps {
                 echo '========================================'
-                echo '       VERIFYING CLI TOOLS & FILES     '
+                echo '       VERIFYING CLI TOOLS & SETUP      '
                 echo '========================================'
                 sh '''
-                    echo "Current Directory: $(pwd)"
-                    echo ""
-                    echo "Docker Version:"
-                    docker --version || echo "Docker not in PATH"
-                    echo ""
-                    echo "Kubectl Version:"
-                    kubectl version --client || echo "Kubectl not in PATH"
-                    echo ""
-                    echo "Project Structure:"
-                    ls -la
+                    mkdir -p "${WORKSPACE}/bin"
+
+                    # If kubectl is missing in Jenkins container, automatically install it
+                    if ! command -v kubectl >/dev/null 2>&1; then
+                        echo "kubectl binary not found in PATH. Downloading standalone kubectl..."
+                        curl -sSL -o "${WORKSPACE}/bin/kubectl" "https://dl.k8s.io/release/v1.30.0/bin/linux/amd64/kubectl" || \
+                        wget -qO "${WORKSPACE}/bin/kubectl" "https://dl.k8s.io/release/v1.30.0/bin/linux/amd64/kubectl"
+                        chmod +x "${WORKSPACE}/bin/kubectl"
+                    fi
+
+                    echo "Docker Version:  $(docker --version 2>/dev/null || echo 'Docker CLI not found')"
+                    echo "Kubectl Version: $(kubectl version --client 2>/dev/null || echo 'Kubectl CLI not found')"
+                    echo "Working Dir:     $(pwd)"
                 '''
             }
         }
@@ -91,11 +95,11 @@ pipeline {
                     echo "========================================"
                     echo "           CLUSTER STATUS               "
                     echo "========================================"
-                    kubectl get pods -o wide
+                    kubectl get pods -o wide || true
                     echo ""
-                    kubectl get svc -o wide
+                    kubectl get svc -o wide || true
                     echo ""
-                    kubectl get pvc
+                    kubectl get pvc || true
                 '''
             }
         }
@@ -106,7 +110,7 @@ pipeline {
             echo '========================================================'
             echo '             FULL-STACK DEPLOYMENT SUCCESSFUL           '
             echo '========================================================'
-            echo 'Frontend is available at:  http://<HOST_IP>:30080'
+            echo 'Frontend is available at:    http://<HOST_IP>:30080'
             echo 'Backend API is available at: http://<HOST_IP>:30500'
             echo 'MongoDB is running internally at port 27017'
             echo '========================================================'
