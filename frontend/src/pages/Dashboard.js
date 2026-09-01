@@ -29,7 +29,7 @@ const Dashboard = () => {
     fetchMyListings();
   }, []);
 
-  // Compute Statistics
+  // Compute Statistics #Tharrun
   const totalListings = myListings.length;
   const donateListings = myListings.filter(item => item.listingType === 'DONATE').length;
   const rentListings = myListings.filter(item => item.listingType === 'RENT').length;
