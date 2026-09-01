@@ -9,6 +9,11 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    networks:
+      reloop-network:
+        aliases:
+          - mongo
+          - mongo-service
 
   backend:
     build: ./backend
@@ -24,6 +29,11 @@ services:
       - MONGO_URI=mongodb://mongo:27017/reloop
       - JWT_SECRET=supersecretkey
       - PORT=5000
+    networks:
+      reloop-network:
+        aliases:
+          - backend
+          - backend-service
 
   frontend:
     build: ./frontend
@@ -33,6 +43,15 @@ services:
       - backend
     ports:
       - "3000:80"
+    networks:
+      reloop-network:
+        aliases:
+          - frontend
+          - frontend-service
+
+networks:
+  reloop-network:
+    driver: bridge
 
 volumes:
   mongo_data:
